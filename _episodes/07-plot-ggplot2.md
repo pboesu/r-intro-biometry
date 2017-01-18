@@ -1,5 +1,5 @@
 ---
-title: Creating Publication-Quality Graphics
+title: Creating Publication-Quality Graphics 02
 teaching: 60
 exercises: 20
 questions:
@@ -44,6 +44,19 @@ Let's start off with an example:
 
 ~~~
 library("ggplot2")
+~~~
+{: .r}
+
+
+
+~~~
+Warning: package 'ggplot2' was built under R version 3.3.2
+~~~
+{: .error}
+
+
+
+~~~
 ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
   geom_point()
 ~~~
