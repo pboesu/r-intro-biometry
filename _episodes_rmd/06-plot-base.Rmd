@@ -31,4 +31,138 @@ package, and the [ggplot2][ggplot2] package.
 
 Today we'll be learning about the base package, which implements commonly used plotting tasks without the need for additional packages. Base plotting is very stable, and allows highly customized plotting, but elaborate figures often require elaborate code.
 
-[TBA]
+# Creating a graph
+
+In R, graphs are typically created interactively. We will use the `mtcars` data, which are included in R as an example `data.frame`. The data set comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles. More details about it can be found in the corresponding help file (`?mtcars`).
+
+```{r example-graph}
+#creating a scatterplot
+plot(mtcars$wt, mtcars$mpg) 
+abline(lm(mtcars$mpg~mtcars$wt))
+title("Regression of MPG on Weight")
+```
+The `plot( )` function plots weight vs. miles per gallon into RStudio "Plots" pane. If you are using the R GUI, or R from the command line, a plot window is opened. 
+The next line of code adds a regression line to this graph. We will learn more about the `lm()` function, when we get to the statistics portion of this class.
+The final line adds a title.
+
+# Saving graphs
+
+Saving Graphs
+You can save the graph in a variety of formats from the RStudio plots pane by using the "Export" button. You can also save the graph programmatically using one of several graphics device functions.
+
+| Function	| Output |
+|-----------|--------|
+|pdf("mygraph.pdf") |	pdf file|
+|win.metafile("mygraph.wmf")|	windows metafile|
+|png("mygraph.png")|	png file|
+|jpeg("mygraph.jpg")|	jpeg file|
+|bmp("mygraph.bmp")|	bmp file|
+|postscript("mygraph.ps")|	postscript file|
+
+When saving to file using the above functions, you call the device function to specify the output, then execute your plotting commands, and finally close the target fiel with the command `dev.off()`
+
+```{r plot-pdf, eval=FALSE}
+#specify target file and format
+pdf("plot_wt_mpg.pdf")
+#make the graph
+plot(mtcars$wt, mtcars$mpg) 
+abline(lm(mtcars$mpg~mtcars$wt))
+title("Regression of MPG on Weight")
+#now close the graphics device and the target file
+dev.off()
+```
+
+You can control the dimensions of the output with additional arguments described in `?pdf`, e.g. `height` and `width`.
+
+# Simple Scatterplot
+There are many ways to create a scatterplot in R. The basic function is `plot(x, y)`, where `x` and `y` are numeric vectors denoting the (x,y) points to plot.
+# Simple Scatterplot
+```{r scatter_plot_w_customisation}
+plot(mtcars$wt, mtcars$mpg, main="Scatterplot Example", 
+  	xlab="Car Weight ", ylab="Miles Per Gallon ", pch=19)
+```
+
+Now we used additional arguments to specify the title (`main`) and axis labels (`xlab`,`xlim`) in the plotting call.
+
+Creating a new graph by issuing a high level plotting command (plot, hist, boxplot, etc.) will typically overwrite a previous graph. To add points or lines to an existing graph use functions like `points()`, `lines()` or `abline()`.
+
+# Add lines
+```{r plot_add_points}
+plot(mtcars$wt, mtcars$mpg, main="Scatterplot Example", 
+  	xlab="Car Weight ", ylab="Miles Per Gallon ", pch=19)
+abline(h=20, col="red") # horizontal line at mpg=20
+abline(v=4, col="green") # vertical line at wt=4
+abline(a=0,b=10, lty=2) # line with the equation y = a + b * x
+```
+
+## Customizing plotting symbols and colors
+Above we used arguments like `pch=19`, `lty=2` and `col="red"`, which changed the appearance of certain plot elements.
+
+Base R offers a variety of plotting symbols, each identified with a numeric code to the `pch` ("plotting character") argument.
+THe same applies to line types (via `lty`). R provides 6 line types, and colors.
+
+We can make a handy chart using the plotting functions different symbols
+
+```{r pch_chart}
+plot(1:25,rep(1,25), pch=1:25, col="black", bg="red")
+text(x=1:25,y=0.95, labels=1:25) #note that the labels are automatically transformed to character
+#we can also use arbitrary characters as plotting symbol
+points(1:8, rep(0.8,8), pch=c(".", "+", "O", "a", "b", "A", "B", "%"))
+text(1:8, rep(0.75,8), labels=c(".", "+", "O", "a", "b", "A", "B", "%"))
+#lastly we can add different line types in the top
+abline(h=1.4,lty=1, col=1)
+abline(h=1.35,lty=2, col=2)
+abline(h=1.3,lty=3, col=3)
+abline(h=1.25,lty=4, col=4)
+abline(h=1.2,lty=5, col=4)
+abline(h=1.15,lty=6, col=5)
+```
+
+There are numeric codes for 10 colors, but colors can also be specified by name. The possible names can be displayed with the `colors()` function. More about color specification can be found in the guide by Earl Glynn: http://research.stowers-institute.org/efg/R/Color/Chart/index.htm
+
+## Customizing plotting ranges
+The plotting range of a single panel can be controlled using the `xlim` and `ylim` arguments. By default R will use the ranges of the variables you plot, plus a small buffer on the edges. both arguments take a 2 element numeric vector of the form c(lower_limit,upper_limit).
+
+```{r plot_limits}
+plot(1:10,10:1)
+plot(1:10,10:1,xlim=c(2,4),ylim=c(1,100))
+```
+
+# Histograms
+You can create histograms with the function `hist(x)` where `x` is a numeric vector of values to be plotted. The option `freq=FALSE` plots probability densities instead of frequencies. The option `breaks=` controls the number of bins.
+
+```{r histogram}
+# Simple Histogram
+hist(mtcars$mpg)
+```
+```{r custom_histogram}
+# Colored Histogram with Different Number of Bins
+hist(mtcars$mpg, breaks=12, col="red")
+```
+
+# Boxplots
+Boxplots can be created for individual variables or for variables by group. The format is `boxplot(x, data=)`, where `x` is a *formula* and `data=` denotes the data frame providing the data. An example of a formula is `y~group` where a separate boxplot for numeric variable `y` is generated for each value of `group`. Add `varwidth=TRUE` to make boxplot widths proportional to the square root of the samples sizes. Add `horizontal=TRUE` to reverse the axis orientation.
+```{r boxplots}
+# simple boxplot
+boxplot(mtcars$mpg)
+# Boxplot of MPG by Car Cylinders 
+boxplot(mpg~cyl,data=mtcars, main="Car Milage Data", 
+  	xlab="Number of Cylinders", ylab="Miles Per Gallon")
+```
+
+A good resource for basic plots can be found on the Quick-R Graphs pages: http://www.statmethods.net/graphs/index.html
+
+# Multipanel figures
+Many, many customisations can be achieved with the `par` function. Most notably it is possible to arrange multiple plots on a grid using the `mfrow` or `mfcol` argument in `par`
+Both arguments take a numeric vector of the form c(nr, nc). Subsequent figures will be drawn in an nr-by-nc array on the device by columns (`mfcol`), or rows (`mfrow`), respectively.
+
+```{r panels}
+par(mfrow=c(1,2))
+# simple boxplot
+boxplot(mtcars$mpg)
+# Boxplot of MPG by Car Cylinders 
+boxplot(mpg~cyl,data=mtcars, main="Car Milage Data", 
+  	xlab="Number of Cylinders", ylab="Miles Per Gallon")
+```
+
+**Changes to `par` usually persist until you clear the plotting device with the broom icon, or with `dev.off()`**
